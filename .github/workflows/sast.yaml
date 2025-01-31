@@ -1,0 +1,30 @@
+# Name of this GitHub Actions workflow.
+name: SAST
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/sast.yml
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep/ci
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep
+
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep ci --json --json-output ./semgrep.json
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
